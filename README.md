@@ -53,8 +53,8 @@ The logistic regression model was implemented using scikit-learn's LogisticRegre
 ### Performance Metrics
 based on the train and test sets
 - **Test Accuracy**: 93.39%
-- **Precision**: 0.94 (weighted average)
-- **Recall**: 0.93 (weighted average)
+- **Precision**: 94% (weighted average)
+- **Recall**: 93% (weighted average)
   # Logistic Regression Implementation and Analysis
 
 ## Implementation Details
