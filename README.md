@@ -27,8 +27,25 @@ based on the train and test sets
 - **Class Distribution Analysis**: The near-50% accuracy indicates a relatively balanced dataset
 
 The baseline model's performance highlights the need for better approaches, as its accuracy is only slightly higher than random guessing. This shows the importance of using smarter models to make better predictions.
+# Baseline Model Implementation and Analysis
+
+### Implementation Details
+```python
+# Create and train baseline model
+baseline_model = DummyClassifier(strategy='most_frequent')
+baseline_model.fit(X_train, y_train)
+
+# Generate predictions
+y_pred = baseline_model.predict(X_test)
+```
+
+### Visualization
+![image](https://github.com/user-attachments/assets/ba2a06a0-fe49-4663-903c-2817f7ccd9d3)
+![image](https://github.com/user-attachments/assets/721281b2-4eba-45ca-9c8c-54abda0d57ec)
+
+
 ## 3. Logistic Regression Implementation
-A logistic regression model was implemented with TF-IDF features and hyperparameter optimization through grid search.
+The logistic regression model was implemented using scikit-learn's LogisticRegression class with hyperparameter optimization through GridSearchCV. The hyperparameter search space included regularization strengths (C) ranging from 0.001 to 100 and both L1 and L2 regularization penalties. Five-fold cross-validation was employed to ensure robust model selection.
 ### Model Configuration
 - **Hyperparameter Search Space**:
   - Regularization strength (C): [0.001, 0.01, 0.1, 1, 10, 100]
@@ -39,10 +56,57 @@ based on the train and test sets
 - **Test Accuracy**: 93.39%
 - **Precision**: 0.94 (weighted average)
 - **Recall**: 0.93 (weighted average)
-### Error Analysis
-- **Validation Performance**: 66.96% accuracy
-- **Observation**: Significant drop in validation accuracy suggests overfitting
-- **Potential Improvements**: Feature selection or stronger regularization could help generalization
+  # Logistic Regression Implementation and Analysis
+
+## Implementation Details
+The preprocessing pipeline included:
+1. Text vectorization using the previously established vectorizer
+2. Train-test split maintained from the baseline model
+3. Grid search cross-validation for hyperparameter tuning
+4. Model training with optimized parameters
+5. Performance evaluation on the test set
+
+### Performance Analysis
+![image](https://github.com/user-attachments/assets/6f47f7b2-7dd9-44ef-82d3-96991ba28d40)
+
+# Logistic Regression Implementation and Analysis
+
+### Implementation Code
+```python
+# Find optimal hyperparameters using grid search
+param_grid = {
+    'C': [0.001, 0.01, 0.1, 1, 10, 100],  # Regularization parameter
+    'penalty': ['l1', 'l2']  # Regularization type
+}
+# Create a Grid Search with cross-validation
+grid_search = GridSearchCV(LogisticRegression(solver='liblinear'), 
+                         param_grid, cv=5, scoring='accuracy')
+
+# Fit the Grid Search to the training data
+grid_search.fit(X_train, y_train)
+
+# Get the best hyperparameters
+best_params = grid_search.best_params_
+```
+
+### Model Training Code
+```python
+# Train a Logistic Regression model with the best hyperparameters
+best_logistic_regression = LogisticRegression(solver='liblinear', **best_params)
+best_logistic_regression.fit(X_train, y_train)
+
+# Make predictions on the test set
+y_pred = best_logistic_regression.predict(X_test)
+```
+
+## Model Optimization Process
+### Initial Challenges
+Initial implementation revealed several challenges, one of them was:
+- High-dimensional feature space: The text vectorization process created a large number of features, which initially led to computational inefficiency and potential overfitting.
+### Optimization Step
+To address these challenge, the following optimizations were implemented
+- Comprehensive hyperparameter tuning using GridSearchCV with cross-validation to find the optimal balance between model complexity and performance. The grid search explored different regularization strengths (C values from 0.001 to 100) to prevent overfitting.
+
 ## 4. Basic Neural Network Implementation
 A fully connected neural network (FCNN) was implemented using PyTorch with a simple architecture.
 ### Architecture
