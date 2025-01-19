@@ -15,8 +15,7 @@ This project addresses the challenge of fake news detection through automated cl
   - Remove English stopwords (common words like "the", "is", "at")
   - TF-IDF vectorization with a maximum of 9,000 features
   - **Data Split**:
-    - Split the train.csv to 80% train and 20% test
-    - define validation from test.csv
+    Split the train.csv to 80% train and 20% test
 ## 2. Baseline Model Implementation
 A baseline model was established using scikit-learn's DummyClassifier with the 'most_frequent' strategy to provide a minimum performance benchmark.
 ### Baseline Results
