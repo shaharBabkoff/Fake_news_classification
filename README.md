@@ -52,7 +52,7 @@ The logistic regression model was implemented using scikit-learn's LogisticRegre
 - **Optimal Parameters**: C=10 with L2 regularization (these parameters were found to be optimal for enhancing accuracy)
 ### Performance Metrics
 based on the train and test sets
-- **Test Accuracy**: 93.39%
+- **Accuracy**: 93.39%
 - **Precision**: 94% (weighted average)
 - **Recall**: 93% (weighted average)
   # Logistic Regression Implementation and Analysis
