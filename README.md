@@ -108,29 +108,104 @@ To address these challenge, the following optimizations were implemented
 - Comprehensive hyperparameter tuning using GridSearchCV with cross-validation to find the optimal balance between model complexity and performance. The grid search explored different regularization strengths (C values from 0.001 to 100) to prevent overfitting.
 
 ## 4. Basic Neural Network Implementation
-A fully connected neural network (FCNN) was implemented using PyTorch with a simple architecture.
-### Architecture
+
+## Model Architecture
+A simple fully connected neural network was implemented using PyTorch, consisting of one hidden layer with 64 neurons and ReLU activation function. The architecture was designed to handle the high-dimensional input from the text vectorization while maintaining computational efficiency.
+
+### Performance Metrics
+based on the train and test sets
+- **Test Accuracy**: 92.24%
+- **Precision**: 92.24% (weighted average)
+- **Recall**: 92.24% (weighted average)
+### Network Structure
+```python
+class FCNN(nn.Module):
+    def __init__(self, input_dim, output_dim):
+        super(FCNN, self).__init__()
+        self.hidden1 = nn.Linear(input_dim, 64)  # First hidden layer
+        self.output = nn.Linear(64, output_dim)  # Output layer
+
+    def forward(self, x):
+        x = torch.relu(self.hidden1(x))
+        x = self.output(x)  # Logits (raw scores)
+        return x
 ```
-Input Layer (9000 features)
-    ↓
-Hidden Layer (64 units, ReLU activation)
-    ↓
-Output Layer (2 units)
+
+## Implementation Details
+
+### Data Preparation
+The input data was converted from sparse matrices to PyTorch tensors and organized into batches for efficient processing:
+
+```python
+# Convert data to PyTorch tensors
+X_train_tensor = torch.tensor(X_train.toarray(), dtype=torch.float32)
+y_train_tensor = torch.tensor(y_train, dtype=torch.long)
+X_test_tensor = torch.tensor(X_test.toarray(), dtype=torch.float32)
+y_test_tensor = torch.tensor(y_test, dtype=torch.long)
+
+# Create DataLoader for batch processing
+train_dataset = TensorDataset(X_train_tensor, y_train_tensor)
+train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
 ```
+
 ### Training Configuration
-- **Batch Size**: 32
-- **Optimizer**: Adam (learning rate = 0.001)
-- **Loss Function**: Cross-Entropy Loss
-- **Epochs**: 5
-### Performance Analysis
-- **Training Accuracy Progression**:
-  - Epoch 1: 87.11%
-  - Epoch 5: 99.16%
-- **Final Test Accuracy**: 92.67%
-### Model Behavior
-- Rapid convergence observed
-- High training accuracy suggests potential overfitting
-- Comparable test performance to logistic regression
+The model was trained using the following hyperparameters:
+- Optimizer: Adam with learning rate 0.001
+- Loss Function: CrossEntropyLoss
+- Batch Size: 32
+- Epochs: 5
+
+```python
+# Initialize model components
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.Adam(model.parameters(), lr=0.001)
+```
+
+### Training Process
+The training loop included performance tracking for both loss and accuracy:
+
+```python
+# Training loop with metric tracking
+for epoch in range(epochs):
+    model.train()
+    epoch_loss = 0
+    correct = 0
+    total = 0
+    for X_batch, y_batch in train_loader:
+        optimizer.zero_grad()
+        outputs = model(X_batch)
+        loss = criterion(outputs, y_batch)
+        loss.backward()
+        optimizer.step()
+
+        # Track metrics
+        epoch_loss += loss.item()
+        _, predicted = torch.max(outputs, 1)
+        total += y_batch.size(0)
+        correct += (predicted == y_batch).sum().item()
+```
+
+### Initial Challenges
+Initial implementation revealed several challenges:
+1. Memory management: Converting sparse matrices to dense PyTorch tensors significantly increased memory usage due to the high-dimensional input space.
+2. Training stability: Initial training attempts showed unstable learning patterns with fluctuating loss values.
+
+### Optimization Steps
+To address these challenges, the following optimizations were implemented:
+1. For Memory Management:
+- Implemented batch processing using DataLoader with batch_size=32, allowing the model to process data in smaller chunks instead of loading all data into memory at once
+- Used a simplified network architecture with only one hidden layer (64 neurons) to reduce the model's memory footprint while maintaining performance
+
+
+2. For Training Stability:
+
+- Employed the Adam optimizer with a carefully tuned learning rate of 0.001, known for its adaptive learning rate properties that help maintain stable training
+- Implemented CrossEntropyLoss as the loss function, which provides stable gradients for classification tasks
+- Added systematic tracking of training metrics (losses and accuracies) to monitor and verify training stability across epochs
+
+## Visualization Results
+![image](https://github.com/user-attachments/assets/611565b4-a8e2-4518-bcf3-2cfd3bf3e3b5)
+
 ## 5. Advanced Neural Network Implementation (LSTM)
 An LSTM-based architecture was implemented to capture sequential patterns in the text data.
 ### Architecture
