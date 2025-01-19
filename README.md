@@ -40,8 +40,8 @@ y_pred = baseline_model.predict(X_test)
 ```
 
 ### Visualization
-![image](https://github.com/user-attachments/assets/ba2a06a0-fe49-4663-903c-2817f7ccd9d3)
-![image](https://github.com/user-attachments/assets/721281b2-4eba-45ca-9c8c-54abda0d57ec)
+![image](https://github.com/user-attachments/assets/2a67d5c9-ba3b-410d-9c6c-5c8456d9f686)
+![image](https://github.com/user-attachments/assets/6ae19a74-8038-4a3c-8b66-400fba266d0b)
 
 
 ## 3. Logistic Regression Implementation
