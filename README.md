@@ -16,6 +16,8 @@ This project addresses the challenge of fake news detection through automated cl
   - TF-IDF vectorization with a maximum of 9,000 features
   - **Data Split**:
     Split the train.csv to 80% train and 20% test
+
+
 ## 2. Baseline Model Implementation
 A baseline model was established using scikit-learn's DummyClassifier with the 'most_frequent' strategy to provide a minimum performance benchmark.
 ### Baseline Results
@@ -33,10 +35,10 @@ The baseline model's performance highlights the need for better approaches, as i
 # Create and train baseline model
 baseline_model = DummyClassifier(strategy='most_frequent')
 baseline_model.fit(X_train, y_train)
-
 # Generate predictions
 y_pred = baseline_model.predict(X_test)
 ```
+
 
 ### Visualization
 ![image](https://github.com/user-attachments/assets/2a67d5c9-ba3b-410d-9c6c-5c8456d9f686)
@@ -65,6 +67,11 @@ The preprocessing pipeline included:
 3. Grid search cross-validation for hyperparameter tuning
 4. Model training with optimized parameters
 5. Performance evaluation on the test set
+
+
+
+
+
 
 ### Performance Analysis
 ![image](https://github.com/user-attachments/assets/6f47f7b2-7dd9-44ef-82d3-96991ba28d40)
@@ -103,9 +110,12 @@ y_pred = best_logistic_regression.predict(X_test)
 ### Initial Challenges
 Initial implementation revealed several challenges, one of them was:
 - High-dimensional feature space: The text vectorization process created a large number of features, which initially led to computational inefficiency and potential overfitting.
+
+
 ### Optimization Step
 To address these challenge, the following optimizations were implemented
 - Comprehensive hyperparameter tuning using GridSearchCV with cross-validation to find the optimal balance between model complexity and performance. The grid search explored different regularization strengths to prevent overfitting.
+
 
 ## 4. Basic Neural Network Implementation
 
@@ -231,6 +241,12 @@ The model includes:
 - **Precision**: 92.28% (weighted average)
 - **Recall**: 92.21% (weighted average)
 
+
+
+
+### Network Structure
+
+
 ```python
 class LSTM(nn.Module):
     def __init__(self, vocab_size, embedding_dim, hidden_dim, n_layers, seq_len):
@@ -283,12 +299,6 @@ for epoch in range(max_epochs):
     val_accs.append(val_accuracy)
     val_losses.append(val_loss)
 ```
-  ׳׳׳
-
-## Performance Metrics
-- *AUC*: Tracked for both training and validation during each epoch.
-- *Accuracy*: Final test accuracy reported.
-- *Precision/Recall*: Detailed metrics provided using classification_report.
 
 ## Visualizations
 Training progress visualized using:
