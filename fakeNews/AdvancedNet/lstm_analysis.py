@@ -23,11 +23,20 @@ def analyze_lstm_performance(model, train_metrics, X_test_tensor, y_test_tensor,
     plt.figure(figsize=(15, 10))
 
     # 1. Training Metrics Plot
+
+    # Training and Validation Metrics Plot
     plt.subplot(221)
     plt.plot(train_metrics['epoch_losses'], label='Training Loss', marker='o')
-    plt.title('Loss Over Epochs')
+
+    # TODO: ADD number 1
+    plt.plot(train_metrics['val_losses'], label='Validation Loss', marker='x')
+    # TODO: END ADD number 1
+
+    # Titles and Labels
+    plt.title('Training and Validation Losses Over Epochs')
     plt.xlabel('Epoch')
     plt.ylabel('Loss')
+
     plt.legend()
     plt.grid(True)
 
