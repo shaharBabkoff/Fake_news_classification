@@ -47,15 +47,16 @@ y_pred = baseline_model.predict(X_test)
 The logistic regression model was implemented using scikit-learn's LogisticRegression class with hyperparameter optimization through GridSearchCV. The hyperparameter search space included regularization strengths (C) ranging from 0.001 to 100 and both L1 and L2 regularization penalties. Five-fold cross-validation was employed to ensure robust model selection.
 ### Model Configuration
 - **Hyperparameter Search Space**:
-  - Regularization strength (C): [0.001, 0.01, 0.1, 1, 10, 100]
+  - Regularization strength (C): [0.0001, 0.001, 0.01]
   - Regularization type: L1 and L2 (Lasso and Ridge)
 - **Optimal Parameters**: C=10 with L2 regularization (these parameters were found to be optimal for enhancing accuracy)
 ### Performance Metrics
 based on the train and test sets
-- **Accuracy**: 93.39%
-- **Precision**: 94% (weighted average)
-- **Recall**: 93% (weighted average)
+- **Accuracy**: 90.86%
+- **Precision**: 92.15% (weighted average)
+- **Recall**: 90.86% (weighted average)
   # Logistic Regression Implementation and Analysis
+
 
 ## Implementation Details
 The preprocessing pipeline included:
@@ -74,7 +75,7 @@ The preprocessing pipeline included:
 ```python
 # Find optimal hyperparameters using grid search
 param_grid = {
-    'C': [0.001, 0.01, 0.1, 1, 10, 100],  # Regularization parameter
+    'C': [0.0001, 0.001, 0.01],  # Regularization parameter
     'penalty': ['l1', 'l2']  # Regularization type
 }
 # Create a Grid Search with cross-validation
@@ -205,54 +206,135 @@ To address these challenges, the following optimizations were implemented:
 ## Visualization Results
 ![image](https://github.com/user-attachments/assets/611565b4-a8e2-4518-bcf3-2cfd3bf3e3b5)
 
-## 5. Advanced Neural Network Implementation (LSTM)
-An LSTM-based architecture was implemented to capture sequential patterns in the text data.
-### Architecture
+# LSTM Model for Fake News Detection
+
+## Summary
+This project implements an LSTM (Long Short-Term Memory) neural network for fake news detection. The model processes news article titles to classify them as legitimate or fake news. The LSTM architecture was chosen for its ability to capture sequential patterns in text data, improving upon the previous FCNN implementation.
+
+## Model Architecture
+```python
+class LSTMModel(nn.Module):
+    def __init__(self, input_dim, hidden_dim, output_dim):
+        super(LSTMModel, self).__init__()
+        self.hidden_dim = hidden_dim
+        
+        # LSTM layer
+        self.lstm = nn.LSTM(
+            input_size=input_dim,
+            hidden_size=hidden_dim,
+            batch_first=True
+        )
+        self.dropout = nn.Dropout(0.3)
+        self.fc = nn.Linear(hidden_dim, output_dim)
+
+    def forward(self, x):
+        lstm_out, _ = self.lstm(x)
+        last_output = lstm_out[:, -1, :]
+        dropped = self.dropout(last_output)
+        output = self.fc(dropped)
+        return output
 ```
-Input Layer
-    ↓
-LSTM Layer (hidden_size=128)
-    ↓
-Dropout Layer (p=0.3)
-    ↓
-Linear Layer (Output)
+
+## Data Preprocessing
+- Input: TF-IDF vectorized news titles (9,000 features)
+- Data split: 80% training, 20% testing
+- Additional validation set from test.csv
+- Batch size: 64
+
+```python
+def prepare_data(X_train, y_train, X_val, y_val, X_test, y_test, batch_size=64):
+    # Convert to PyTorch tensors
+    X_train_tensor = torch.tensor(X_train.toarray(), dtype=torch.float32)
+    y_train_tensor = torch.tensor(y_train, dtype=torch.long)
+    
+    # Create datasets and dataloaders
+    train_dataset = TensorDataset(X_train_tensor, y_train_tensor)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    
+    return train_loader, val_loader, test_loader
 ```
-### Training Configuration
-- **Batch Size**: 64
-- **Optimizer**: Adam (learning rate = 0.001)
-- **Dropout Rate**: 0.3
-- **Epochs**: 10
-### Performance Metrics
-- **Final Training Accuracy**: 99.78%
-- **Validation Accuracy**: 91.92%
-- **Test Accuracy**: 92.31%
-- **Class-wise Performance**:
-  - Class 0: Precision = 0.92, Recall = 0.92, F1 = 0.92
-  - Class 1: Precision = 0.92, Recall = 0.92, F1 = 0.92
-### Model Evolution
-- Training accuracy improved consistently over epochs
-- Dropout helped maintain generalization
-- Final performance comparable to simpler models
-## Comparative Analysis
-### Performance Comparison
-1. Baseline: 50.07% (Test Accuracy)
-2. Logistic Regression: 93.39% (Test Accuracy)
-3. FCNN: 92.67% (Test Accuracy)
-4. LSTM: 92.31% (Test Accuracy)
-### Key Findings
-- All advanced models significantly outperformed the baseline
-- Logistic regression achieved the highest test accuracy
-- Neural networks showed similar performance despite architectural differences
-- Complexity increase did not yield proportional performance gains
-### Model Trade-offs
-- **Logistic Regression**: Best test performance, simpler architecture
-- **FCNN**: Good performance, faster training
-- **LSTM**: Similar performance, higher computational cost
+
+## Training Process
+- Optimizer: Adam (learning rate = 0.001)
+- Loss Function: CrossEntropyLoss
+- Epochs: 10
+- Early stopping implemented
+
+```python
+def train_model(model, train_loader, val_loader, epochs=10):
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
+    
+    for epoch in range(epochs):
+        model.train()
+        for X_batch, y_batch in train_loader:
+            optimizer.zero_grad()
+            outputs = model(X_batch.unsqueeze(1))
+            loss = criterion(outputs, y_batch)
+            loss.backward()
+            optimizer.step()
+```
+
+## Model Performance
+### Final Results
+- Training Accuracy: 91.95%
+- Validation Accuracy: 92.02%
+- Test Accuracy: 91.95%
+
+## Implementation Challenges and Solutions
+
+### 1. Input Dimensionality
+**Challenge**: LSTM required 3D input (batch_size, sequence_length, features)
+**Solution**: Implemented dynamic input reshaping using unsqueeze()
+
+### 2. Overfitting
+**Challenge**: High training accuracy (99.9%) but lower validation (85.3%)
+**Solutions**:
+- Added dropout (0.3)
+- Increased batch size to 64
+- Implemented early stopping
+
+## Visualizations
+![image](https://github.com/user-attachments/assets/96384bd6-a3cd-4baa-8b36-506676a35f93)
+
+
+## Comparison with all Models
+
+### Performance Analysis
+| Model               | Test Accuracy | Key Advantage                    | Trade-off                      |
+|--------------------|---------------|----------------------------------|--------------------------------|
+| Baseline           | 50.07%        | Simple benchmark                 | Poor performance               |
+| Logistic Regression| 90.86%        | Simple, effective               | Limited feature learning       |
+| FCNN              | 92.24%        | Best performance, faster training| More parameters than logistic  |
+| LSTM              | 91.95%        | Captures sequential patterns     | Higher computational cost      |
+
+### Architecture Comparison
+1. **Baseline vs Advanced Models**:
+   - All advanced models showed ~40% improvement
+   - Demonstrates the value of machine learning approaches
+
+2. **FCNN vs LSTM**:
+   - FCNN achieved slightly better accuracy (+0.29%)
+   - LSTM shows comparable performance despite different architecture
+   - FCNN offers better efficiency for this task
+
+3. **Logistic Regression vs Neural Networks**:
+   - Neural networks showed modest improvements
+   - Complexity increase yielded minor accuracy gains
+
+## Key Findings
+ **Model Performance**:
+   - FCNN achieved the highest test accuracy (92.24%)
+   - LSTM performed comparably (91.95%)
+   - Logistic regression was competitive (90.86%)
+   - All significantly outperformed baseline (50.07%)
+
+
+
 ## Conclusions
-The project demonstrates that while deep learning models can effectively classify fake news titles, simpler models like logistic regression can achieve comparable or better performance for this specific task. The similar performance across different architectures suggests that the distinguishing features between fake and legitimate news titles may be effectively captured by linear relationships in the TF-IDF space.
-Future work could explore:
-- Feature engineering improvements
-- Ensemble methods
-- More sophisticated text preprocessing
-- Attention mechanisms
-- Transfer learning with pre-trained language models
+The project demonstrates that while both simple and complex models can effectively classify fake news titles, the FCNN achieved the best performance with a test accuracy of 92.24%. The LSTM model, despite its more sophisticated architecture, performed slightly lower at 91.95%. This suggests that for this specific task:
+
+1. The distinguishing features between fake and legitimate news titles may be effectively captured by simpler neural architectures
+2. Sequential patterns captured by LSTM may not provide significant advantages for this classification task
+3. The additional computational cost of LSTM might not be justified given the minimal performance difference
+
