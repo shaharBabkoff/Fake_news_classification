@@ -207,7 +207,7 @@ To address these challenges, the following optimizations were implemented:
 ![Fcnn_Graphs 1](https://github.com/user-attachments/assets/865106d0-9812-4460-877e-63892b995b7e)
 
 
-# LSTM Model for Fake News Detection
+# 5. LSTM Model for Fake News Detection
 
 ## Summary
 This project implements an LSTM-based neural network for detecting fake news. The model analyzes news article titles to classify them as legitimate or fake. The architecture leverages embedding layers, multi-layer LSTMs, and dropout regularization to effectively handle sequential text data and mitigate overfitting.
@@ -254,13 +254,36 @@ class LSTM(nn.Module):
         x = self.fc(x)
         return F.log_softmax(x, dim=-1)
 ```
+### Training Configuration
 
-## Training Process
 - *Optimizer*: Adam with weight decay.(lr=0.00025)
 - *Loss Function*: CrossEntropyLoss with dynamic class weights.
 - *Batch Size*: 32.
 - *Epochs*: 10.
 - *Device*: CPU (can be adapted for GPU).
+
+```python
+criterion = CrossEntropyLoss(weight=class_weights, reduction="mean")
+optimizer = Adam(model.parameters(), lr=learning_rate, weight_decay=1e-5)
+scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=2)
+```
+## Training Process
+
+```python
+for epoch in range(max_epochs):
+    train_auc, train_accuracy, train_loss = trainer.train(
+        current_epoch_nr=epoch)
+    train_aucs.append(train_auc)
+    train_accs.append(train_accuracy)
+    train_losses.append(train_loss)
+
+    val_auc, val_accuracy, val_loss = trainer.evaluate(
+        current_epoch_nr=epoch, scheduler=scheduler)
+    val_aucs.append(val_auc)
+    val_accs.append(val_accuracy)
+    val_losses.append(val_loss)
+```
+  ׳׳׳
 
 ## Performance Metrics
 - *AUC*: Tracked for both training and validation during each epoch.
@@ -290,36 +313,39 @@ Training progress visualized using:
 |--------------------|---------------|----------------------------------|--------------------------------|
 | Baseline           | 50.07%        | Simple benchmark                 | Poor performance               |
 | Logistic Regression| 90.86%        | Simple, effective               | Limited feature learning       |
-| FCNN              | 92.24%        | Best performance, faster training| More parameters than logistic  |
-| LSTM              | 91.95%        | Captures sequential patterns     | Higher computational cost      |
+| FCNN              | 91.97%        | Best performance, faster training| More parameters than logistic  |
+| LSTM              |  92.21%        | Captures sequential patterns     | Higher computational cost      |
 
 ### Architecture Comparison
-1. **Baseline vs Advanced Models**:
-   - All advanced models showed ~40% improvement
-   - Demonstrates the value of machine learning approaches
+## Baseline vs Advanced Models
 
-2. **FCNN vs LSTM**:
-   - FCNN achieved slightly better accuracy (+0.29%)
-   - LSTM shows comparable performance despite different architecture
-   - FCNN offers better efficiency for this task
+- All advanced models showed ~40% improvement.
+- Demonstrates the value of machine learning approaches.
 
-3. **Logistic Regression vs Neural Networks**:
-   - Neural networks showed modest improvements
-   - Complexity increase yielded minor accuracy gains
+## FCNN vs LSTM
 
-## Key Findings
- **Model Performance**:
-   - FCNN achieved the highest test accuracy (92.24%)
-   - LSTM performed comparably (91.95%)
-   - Logistic regression was competitive (90.86%)
-   - All significantly outperformed baseline (50.07%)
+- LSTM achieved better accuracy (+0.24%).
+- LSTM offers better sequential pattern capture, though at a higher computational cost.
+
+# Key Findings
+
+## Model Performance
+
+- **LSTM** achieved the highest test accuracy (92.21%).
+- **FCNN** performed comparably (91.97%).
+- **Logistic Regression** was competitive (90.86%).
+- All significantly outperformed baseline (50.07%).
+
+# Conclusions
+
+The project demonstrates that while both simple and complex models can effectively classify fake news titles, the **LSTM** achieved the best performance with a test accuracy of 92.21%. The **FCNN** model, despite its simpler architecture, performed slightly lower at 91.97%. This suggests that for this specific task:
+
+1. The distinguishing features between fake and legitimate news titles may benefit from sequential pattern analysis provided by **LSTM**.
+2. Simpler architectures like **FCNN** are competitive and may be preferred in resource-constrained scenarios.
+3. **Logistic Regression** remains a strong baseline for tasks where simplicity is critical.
 
 
 
-## Conclusions
-The project demonstrates that while both simple and complex models can effectively classify fake news titles, the FCNN achieved the best performance with a test accuracy of 92.24%. The LSTM model, despite its more sophisticated architecture, performed slightly lower at 91.95%. This suggests that for this specific task:
 
-1. The distinguishing features between fake and legitimate news titles may be effectively captured by simpler neural architectures
-2. Sequential patterns captured by LSTM may not provide significant advantages for this classification task
-3. The additional computational cost of LSTM might not be justified given the minimal performance difference
+
 
