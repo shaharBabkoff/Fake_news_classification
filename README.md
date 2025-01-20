@@ -49,7 +49,7 @@ The logistic regression model was implemented using scikit-learn's LogisticRegre
 - **Hyperparameter Search Space**:
   - Regularization strength (C): [0.0001, 0.001, 0.01]
   - Regularization type: L1 and L2 (Lasso and Ridge)
-- **Optimal Parameters**: C=10 with L2 regularization (these parameters were found to be optimal for enhancing accuracy)
+- **Optimal Parameters**: C=0.01 with L1 regularization (these parameters were found to be optimal for enhancing accuracy)
 ### Performance Metrics
 based on the train and test sets
 - **Accuracy**: 90.86%
@@ -105,7 +105,7 @@ Initial implementation revealed several challenges, one of them was:
 - High-dimensional feature space: The text vectorization process created a large number of features, which initially led to computational inefficiency and potential overfitting.
 ### Optimization Step
 To address these challenge, the following optimizations were implemented
-- Comprehensive hyperparameter tuning using GridSearchCV with cross-validation to find the optimal balance between model complexity and performance. The grid search explored different regularization strengths (C values from 0.001 to 100) to prevent overfitting.
+- Comprehensive hyperparameter tuning using GridSearchCV with cross-validation to find the optimal balance between model complexity and performance. The grid search explored different regularization strengths to prevent overfitting.
 
 ## 4. Basic Neural Network Implementation
 
