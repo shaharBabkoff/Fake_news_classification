@@ -51,7 +51,7 @@ The logistic regression model was implemented using scikit-learn's LogisticRegre
   - Regularization type: L1 and L2 (Lasso and Ridge)
 - **Optimal Parameters**: C=0.01 with L1 regularization (these parameters were found to be optimal for enhancing accuracy)
 ### Performance Metrics
-based on the train and test sets
+
 - **Accuracy**: 90.86%
 - **Precision**: 92.15% (weighted average)
 - **Recall**: 90.86% (weighted average)
@@ -224,6 +224,12 @@ The model includes:
 2. *LSTM Layers*: Two stacked LSTM layers with hidden dimension 64 to capture temporal dependencies.
 3. *Dropout*: Applied both within the LSTM layers and before the fully connected layer.
 4. *Fully Connected Layer*: Maps LSTM outputs to binary logits.
+
+### Performance Metrics
+
+- **Accuracy**: 92.21%
+- **Precision**: 92.28% (weighted average)
+- **Recall**: 92.21% (weighted average)
 
 ```python
 class LSTM(nn.Module):
