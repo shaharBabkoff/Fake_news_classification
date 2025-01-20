@@ -22,12 +22,15 @@ def analyze_fcnn_model(model, train_metrics, X_test_tensor, y_test_tensor):
     
     # Plot training loss
     plt.subplot(131)
-    plt.plot(train_metrics['losses'], marker='o')
-    plt.title('Training Loss Over Epochs')
+    plt.plot(train_metrics['losses'], label='Train Loss', marker='o')
+    plt.plot(train_metrics['val_losses'], label='Validation Loss', marker='o')
+
+    plt.title('Training and Validation Loss Over Epochs')
     plt.xlabel('Epoch')
     plt.ylabel('Loss')
+    plt.legend()
     plt.grid(True)
-    
+
     # Plot training accuracy
     plt.subplot(132)
     plt.plot(train_metrics['accuracies'], marker='o', color='green')
