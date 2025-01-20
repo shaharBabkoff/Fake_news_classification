@@ -204,7 +204,8 @@ To address these challenges, the following optimizations were implemented:
 - Added systematic tracking of training metrics (losses and accuracies) to monitor and verify training stability across epochs
 
 ## Visualization Results
-![image](https://github.com/user-attachments/assets/611565b4-a8e2-4518-bcf3-2cfd3bf3e3b5)
+![Fcnn_Graphs 1](https://github.com/user-attachments/assets/865106d0-9812-4460-877e-63892b995b7e)
+
 
 # LSTM Model for Fake News Detection
 
@@ -289,7 +290,8 @@ def train_model(model, train_loader, val_loader, epochs=10):
 - Implemented early stopping
 
 ## Visualizations
-![image](https://github.com/user-attachments/assets/96384bd6-a3cd-4baa-8b36-506676a35f93)
+![Advanced_Graphs 1](https://github.com/user-attachments/assets/37a6d45b-c4e2-46cd-98fd-16a7f380249e)
+
 
 
 ## Comparison with all Models
