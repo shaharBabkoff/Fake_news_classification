@@ -113,10 +113,10 @@ To address these challenge, the following optimizations were implemented
 A simple fully connected neural network was implemented using PyTorch, consisting of one hidden layer with 64 neurons and ReLU activation function. The architecture was designed to handle the high-dimensional input from the text vectorization while maintaining computational efficiency.
 
 ### Performance Metrics
-based on the train and test sets
-- **Test Accuracy**: 92.24%
-- **Precision**: 92.24% (weighted average)
-- **Recall**: 92.24% (weighted average)
+
+- **Test Accuracy**: 91.97%
+- **Precision**: 92.01% (weighted average)
+- **Recall**: 91.07% (weighted average)
 ### Network Structure
 ```python
 class FCNN(nn.Module):
