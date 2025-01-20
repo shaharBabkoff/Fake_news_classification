@@ -210,87 +210,70 @@ To address these challenges, the following optimizations were implemented:
 # LSTM Model for Fake News Detection
 
 ## Summary
-This project implements an LSTM (Long Short-Term Memory) neural network for fake news detection. The model processes news article titles to classify them as legitimate or fake news. The LSTM architecture was chosen for its ability to capture sequential patterns in text data, improving upon the previous FCNN implementation.
+This project implements an LSTM-based neural network for detecting fake news. The model analyzes news article titles to classify them as legitimate or fake. The architecture leverages embedding layers, multi-layer LSTMs, and dropout regularization to effectively handle sequential text data and mitigate overfitting.
+
+## Key Updates
+- *Vocabulary Size*: Limited to 40,000 tokens for efficient embedding.
+- *Preprocessing*: Texts are cleaned (stopwords removed, lowercased), tokenized, and padded to a fixed sequence length of 18.
+- *Dynamic Class Balancing*: Added class weights to the loss function to address label imbalances.
+- *Scheduler*: Learning rate adjusted dynamically using ReduceLROnPlateau to prevent plateauing.
 
 ## Model Architecture
+The model includes:
+1. *Embedding Layer*: Converts token IDs to dense vector representations.
+2. *LSTM Layers*: Two stacked LSTM layers with hidden dimension 64 to capture temporal dependencies.
+3. *Dropout*: Applied both within the LSTM layers and before the fully connected layer.
+4. *Fully Connected Layer*: Maps LSTM outputs to binary logits.
+
 ```python
-class LSTMModel(nn.Module):
-    def __init__(self, input_dim, hidden_dim, output_dim):
-        super(LSTMModel, self).__init__()
-        self.hidden_dim = hidden_dim
-        
-        # LSTM layer
+class LSTM(nn.Module):
+    def __init__(self, vocab_size, embedding_dim, hidden_dim, n_layers, seq_len):
+        super(LSTM, self).__init__()
+        self.embedding = nn.Embedding(vocab_size, embedding_dim)
         self.lstm = nn.LSTM(
-            input_size=input_dim,
+            input_size=embedding_dim,
             hidden_size=hidden_dim,
-            batch_first=True
+            num_layers=n_layers,
+            batch_first=True,
+            dropout=0.3
         )
-        self.dropout = nn.Dropout(0.3)
-        self.fc = nn.Linear(hidden_dim, output_dim)
+        self.fc = nn.Linear(seq_len * hidden_dim, 2)
+        self.dropout = nn.Dropout(0.5)
 
     def forward(self, x):
-        lstm_out, _ = self.lstm(x)
-        last_output = lstm_out[:, -1, :]
-        dropped = self.dropout(last_output)
-        output = self.fc(dropped)
-        return output
-```
-
-```python
-# Convert data to PyTorch tensors
-X_train_tensor = torch.tensor(X_train.toarray(), dtype=torch.float32)
-y_train_tensor = torch.tensor(y_train, dtype=torch.long)
-
-X_val_tensor = torch.tensor(X_val.toarray(), dtype=torch.float32)
-y_val_tensor = torch.tensor(y_val, dtype=torch.long)
-
-X_test_tensor = torch.tensor(X_test.toarray(), dtype=torch.float32)
-y_test_tensor = torch.tensor(y_test, dtype=torch.long)
-
+        x = self.embedding(x)
+        x, _ = self.lstm(x)
+        x = torch.reshape(x, (x.size(0), -1))
+        x = self.dropout(x)
+        x = self.fc(x)
+        return F.log_softmax(x, dim=-1)
 ```
 
 ## Training Process
-- Optimizer: Adam (learning rate = 0.001)
-- Loss Function: CrossEntropyLoss
-- Epochs: 10
-- Early stopping implemented
+- *Optimizer*: Adam with weight decay.(lr=0.00025)
+- *Loss Function*: CrossEntropyLoss with dynamic class weights.
+- *Batch Size*: 32.
+- *Epochs*: 10.
+- *Device*: CPU (can be adapted for GPU).
 
-```python
-def train_model(model, train_loader, val_loader, epochs=10):
-    criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
-    
-    for epoch in range(epochs):
-        model.train()
-        for X_batch, y_batch in train_loader:
-            optimizer.zero_grad()
-            outputs = model(X_batch.unsqueeze(1))
-            loss = criterion(outputs, y_batch)
-            loss.backward()
-            optimizer.step()
-```
-
-## Model Performance
-### Final Results
-- Training Accuracy: 91.95%
-- Validation Accuracy: 92.02%
-- Test Accuracy: 91.95%
-
-## Implementation Challenges and Solutions
-
-### 1. Input Dimensionality
-**Challenge**: LSTM required 3D input (batch_size, sequence_length, features)
-**Solution**: Implemented dynamic input reshaping using unsqueeze()
-
-### 2. Overfitting
-**Challenge**: High training accuracy (99.9%) but lower validation (85.3%)
-**Solutions**:
-- Added dropout (0.3)
-- Increased batch size to 64
-- Implemented early stopping
+## Performance Metrics
+- *AUC*: Tracked for both training and validation during each epoch.
+- *Accuracy*: Final test accuracy reported.
+- *Precision/Recall*: Detailed metrics provided using classification_report.
 
 ## Visualizations
+Training progress visualized using:
+1. AUC per epoch.
+2. Accuracy trends for training and validation.
+3. Loss curves for both datasets.
+
 ![Advanced_Graphs 1](https://github.com/user-attachments/assets/37a6d45b-c4e2-46cd-98fd-16a7f380249e)
+## Results
+### Final Test Performance
+- *Accuracy*: Achieved using classification_report.
+- *Precision*: Weighted for imbalanced datasets.
+- *Recall*: Weighted metrics ensure robust evaluation.
+
 
 
 
