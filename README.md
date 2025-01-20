@@ -235,23 +235,17 @@ class LSTMModel(nn.Module):
         return output
 ```
 
-## Data Preprocessing
-- Input: TF-IDF vectorized news titles (9,000 features)
-- Data split: 80% training, 20% testing
-- Additional validation set from test.csv
-- Batch size: 64
-
 ```python
-def prepare_data(X_train, y_train, X_val, y_val, X_test, y_test, batch_size=64):
-    # Convert to PyTorch tensors
-    X_train_tensor = torch.tensor(X_train.toarray(), dtype=torch.float32)
-    y_train_tensor = torch.tensor(y_train, dtype=torch.long)
-    
-    # Create datasets and dataloaders
-    train_dataset = TensorDataset(X_train_tensor, y_train_tensor)
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-    
-    return train_loader, val_loader, test_loader
+# Convert data to PyTorch tensors
+X_train_tensor = torch.tensor(X_train.toarray(), dtype=torch.float32)
+y_train_tensor = torch.tensor(y_train, dtype=torch.long)
+
+X_val_tensor = torch.tensor(X_val.toarray(), dtype=torch.float32)
+y_val_tensor = torch.tensor(y_val, dtype=torch.long)
+
+X_test_tensor = torch.tensor(X_test.toarray(), dtype=torch.float32)
+y_test_tensor = torch.tensor(y_test, dtype=torch.long)
+
 ```
 
 ## Training Process
